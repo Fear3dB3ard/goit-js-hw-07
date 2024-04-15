@@ -1,43 +1,52 @@
 import { galleryItems } from "./gallery-items.js";
-// Change code below this line
-document.addEventListener("DOMContentLoaded", function () {
-  const gallery = document.querySelector(".gallery");
 
-  function createGalleryItem(item) {
-    const li = document.createElement("li");
-    li.classList.add("gallery__item");
+// gallery container
+const gallery = document.querySelector(".gallery");
 
-    const a = document.createElement("a");
-    a.classList.add("gallery__link");
-    a.href = item.original;
+//  create and render gallery items
+function createGalleryItem(item) {
+  const galleryItem = document.createElement("li");
+  galleryItem.classList.add("gallery__item");
 
-    const img = document.createElement("img");
-    img.classList.add("gallery__image");
-    img.src = item.preview;
-    img.setAttribute("data-source", item.original);
-    img.alt = item.description;
+  const link = document.createElement("a");
+  link.classList.add("gallery__link");
+  link.href = item.original;
 
-    a.appendChild(img);
-    li.appendChild(a);
-    return li;
-  }
+  const image = document.createElement("img");
+  image.classList.add("gallery__image");
+  image.src = item.preview;
+  image.alt = item.description;
+  image.dataset.source = item.original;
 
-  function openModal(event) {
-    event.preventDefault();
-    if (event.target.nodeName === "IMG") {
-      const imgSrc = event.target.dataset.source;
-      const instance = basicLightbox.create(`<img src="${imgSrc}">`);
-      instance.show();
-    }
-  }
+  link.appendChild(image);
+  galleryItem.appendChild(link);
 
-  gallery.addEventListener("click", openModal);
+  return galleryItem;
+}
 
-  // Populate gallery
-  galleryItems.forEach((item) => {
-    const galleryItem = createGalleryItem(item);
-    gallery.appendChild(galleryItem);
+// open image in fullscreen modal
+function openFullscreenModal(event) {
+  event.preventDefault();
+
+  const imageSrc = event.target.dataset.source;
+
+  const instance = basicLightbox.create(
+    `<img src="${imageSrc}" alt="Fullscreen Image">`
+  );
+
+  instance.show();
+}
+
+// render the gallery
+function renderGallery() {
+  const galleryItemsHTML = galleryItems.map(createGalleryItem);
+  gallery.append(...galleryItemsHTML);
+
+  // Add click event listener to each image
+  const galleryImages = document.querySelectorAll(".gallery__image");
+  galleryImages.forEach((image) => {
+    image.addEventListener("click", openFullscreenModal);
   });
-});
+}
 
-console.log(galleryItems);
+renderGallery();
